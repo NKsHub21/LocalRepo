@@ -1,3 +1,3 @@
 # This is my local repo
 <p> This is a feature (button) </p>
-<p> This is a feature (dropdown)</p>
+<p> This is a feature (button)</p>
