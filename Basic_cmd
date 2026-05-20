@@ -1,0 +1,160 @@
+1. Change Password
+bashpasswd
+# You'll be prompted to enter your current password, then the new one twice
+
+2. Display System Date
+bashdate
+Output: Wed May 20 02:26:59 UTC 2026
+
+3. Count Lines in /etc/passwd
+bashwc -l /etc/passwd
+Output: 23 /etc/passwd
+
+4. Find Who Else is on the System
+bashwho
+# or
+w
+Lists all currently logged-in users with terminal and login time.
+
+5. Redirect man page of date to file mydate
+bashman date | col -b > mydate
+# col -b strips formatting/backspaces for clean output
+Result: mydate created with 110 lines.
+
+6. Create Subdirectory mydir
+bashmkdir mydir
+
+7. Move mydate into mydir
+bashmv mydate mydir/
+
+8. Go to mydir and Copy mydate to ourdate
+bashcd mydir
+cp mydate ourdate
+
+9. List Contents of mydir
+bashls mydir/
+Output: mydate  ourdate
+
+10. Long Listing of ourdate — Note Permissions
+bashls -l mydir/ourdate
+Output: -rw-r--r-- 1 root root 0 May 20 02:26 mydir/ourdate
+Permissions: owner can read+write; group and others can only read.
+
+11. Display Current Directory from Root
+bashpwd
+Output: /home/claude
+
+12. Move Files from mydir Back to Home
+bashmv mydir/* ~/
+
+13. Display First 5 Lines of mydate
+bashhead -5 mydate
+Usage: date [OPTION]... [+FORMAT]
+  or:  date [-u|--utc|--universal] [MMDDhhmm[[CC]YY][.ss]]
+Display date and time in the given FORMAT.
+With -s, or with [MMDDhhmm[[CC]YY][.ss]], set the date and time.
+
+14. Display Last 8 Lines of mydate
+bashtail -8 mydate
+
+15. Remove Directory mydir
+bashrmdir mydir
+
+16. Redirect Long Listing to File list
+bashls -l > list
+
+17. Create capitals1, capitals2, capitals3 → Concatenate to capitals
+bash# capitals1 — Maharashtra cities
+printf "Mumbai\nPune\nNagpur\nNashik\nAurangabad\n" > capitals1
+
+# capitals2 — South India cities
+printf "Chennai\nHyderabad\nBengaluru\nKochi\nTrivandrum\n" > capitals2
+
+# capitals3 — East/Central India cities
+printf "Kolkata\nPatna\nBhopal\nJaipur\nLucknow\n" > capitals3
+
+# Concatenate all 3
+cat capitals1 capitals2 capitals3 > capitals
+
+18. Append capitals2 to End of capitals
+bashcat capitals2 >> capitals
+
+19. Give Read+Write Permissions to All Users for capitals
+bashchmod a+rw capitals
+Result: -rw-rw-rw-
+
+20. Give Read-Only Permission to Owner
+bashchmod u=r,go-rw capitals
+ls -l capitals   # → -r--------
+Now open the file in vi/nano and try to save — you'll get "Permission denied" because even the owner has no write permission. The file is read-only.
+
+21. Create Alias to Concatenate capitals1+2+3
+bashalias makeCapitals='cat capitals1 capitals2 capitals3 > capitals'
+
+# Activate and run it:
+makeCapitals
+To make it permanent, add it to ~/.bashrc.
+
+22. Count Occurrences of "the" in mydate
+bashgrep -oi '\bthe\b' mydate | wc -l
+Output: 22
+
+23. Line Numbers Where "date" Exists in mydate
+bashgrep -n "date" mydate
+Sample output:
+1:Usage: date [OPTION]... [+FORMAT]
+2:  or:  date [-u|--utc|--universal] ...
+3:Display date and time in the given FORMAT.
+7:  -d, --date=STRING   display time described by STRING ...
+
+24. Print All Lines of mydate WITHOUT the Letter "i"
+bashgrep -v "i" mydate
+
+25. List 4-Letter Words from mydate
+bashgrep -ow '\b[a-zA-Z]\{4\}\b' mydate | sort -u
+Sample output: date  each  file  find  full  help  hour  info  last  like  line  show  time  with ...
+
+26. Paste mystates and mycapitals Side by Side
+bashprintf "Sikkim\nMeghalaya\nManipur\nNagaland\nArunachal Pradesh\n" > mystates
+printf "Gangtok\nShillong\nImphal\nKohima\nItanagar\n" > mycapitals
+
+paste mystates mycapitals
+Output:
+Sikkim          Gangtok
+Meghalaya       Shillong
+Manipur         Imphal
+Nagaland        Kohima
+Arunachal Pradesh   Itanagar
+
+27. Cut 1st and 3rd Columns from /etc/passwd
+bashcut -d: -f1,3 /etc/passwd
+Sample output:
+root:0
+daemon:1
+bin:2
+sys:3
+...
+
+28. Count Logged-In Users + Trap Output with tee
+bashwho | tee users_logged_in | wc -l
+tee simultaneously writes who output to users_logged_in and passes it to wc -l for counting.
+
+29. Convert mystates to Uppercase
+bashtr 'a-z' 'A-Z' < mystates
+Output:
+SIKKIM
+MEGHALAYA
+MANIPUR
+NAGALAND
+ARUNACHAL PRADESH
+
+30. Display Common Values Between Two Files
+bashprintf "apple\nbanana\ncherry\ndate\nelderberry\n" > file1.txt
+printf "banana\ndate\nfig\ngrape\napple\n" > file2.txt
+
+comm -12 <(sort file1.txt) <(sort file2.txt)
+Output (common values):
+apple
+banana
+date
+comm -12 suppresses lines unique to file1 and file2, showing only common lines. Files must be sorted first.

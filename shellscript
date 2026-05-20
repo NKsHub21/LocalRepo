@@ -1,0 +1,339 @@
+1. Largest Among Three Numbers — 1_largest.sh
+bash#!/bin/bash
+read -p "Enter first number: " a
+read -p "Enter second number: " b
+read -p "Enter third number: " c
+
+if [ "$a" -ge "$b" ] && [ "$a" -ge "$c" ]; then
+    echo "Largest number is: $a"
+elif [ "$b" -ge "$a" ] && [ "$b" -ge "$c" ]; then
+    echo "Largest number is: $b"
+else
+    echo "Largest number is: $c"
+fi
+Run: bash 1_largest.sh → Input: 10 25 17 → Output: Largest = 25
+
+2. Menu-Driven Arithmetic — 2_arithmetic.sh
+bash#!/bin/bash
+read -p "Enter first number: " a
+read -p "Enter second number: " b
+
+while true; do
+    echo "1.Add  2.Subtract  3.Multiply  4.Divide  5.Exit"
+    read -p "Choice: " choice
+    case $choice in
+        1) echo "Result: $a + $b = $(( a + b ))" ;;
+        2) echo "Result: $a - $b = $(( a - b ))" ;;
+        3) echo "Result: $a * $b = $(( a * b ))" ;;
+        4) [ $b -eq 0 ] && echo "Division by zero!" || echo "Result: $(echo "scale=4; $a/$b" | bc)" ;;
+        5) break ;;
+    esac
+done
+Run: bash 2_arithmetic.sh → Input: 20 4, pick options → Outputs: 24, 16, 80, 5.0000
+
+3. Menu-Driven System Script — 3_menu_system.sh
+bash#!/bin/bash
+while true; do
+    echo "1.Date  2.List Files  3.Disk Usage  4.Count Lines  5.VIT lines  6.Exit"
+    read -p "Choice: " choice
+    case $choice in
+        1) date ;;
+        2) ls -lh ;;
+        3) df -h ;;
+        4) read -p "Filename: " f; wc -l < "$f" ;;
+        5) grep -n "VIT" collegedata.txt ;;
+        6) exit 0 ;;
+    esac
+done
+Run: bash 3_menu_system.sh
+
+Option 5 output: Line 1,2,3,4,5,6 all contain VIT
+
+
+4. Linear Search in Array — 4_linear_search.sh
+bash#!/bin/bash
+read -p "Number of elements: " n
+arr=()
+for (( i=0; i<n; i++ )); do read -p "Element $((i+1)): " e; arr+=($e); done
+read -p "Search for: " target
+
+found=0
+for (( i=0; i<n; i++ )); do
+    if [ "${arr[$i]}" -eq "$target" ]; then
+        echo "Found at index $i (position $((i+1)))"; found=1
+    fi
+done
+[ $found -eq 0 ] && echo "Not found."
+Run: bash 4_linear_search.sh → Array: 10 20 30 40 50, Search: 30 → Found at index 2
+
+5. Factorial via Command Line Arg — 5_factorial.sh
+bash#!/bin/bash
+# Usage: bash 5_factorial.sh <n>
+n=$1
+factorial=1
+for (( i=2; i<=n; i++ )); do factorial=$(( factorial * i )); done
+echo "Factorial of $n = $factorial"
+Run: bash 5_factorial.sh 7 → Output: 5040
+
+6. Automatic Backup with Date — 6_backup.sh
+bash#!/bin/bash
+read -p "Source directory: " src
+read -p "Backup destination: " dest
+mkdir -p "$dest"
+today=$(date +%Y-%m-%d)
+tar -czf "$dest/backup_${today}.tar.gz" "$src"
+echo "Backup created: $dest/backup_${today}.tar.gz"
+Run: bash 6_backup.sh → Creates: backup_2026-05-20.tar.gz
+
+7. Remove Files Older Than N Days — 7_remove_old_files.sh
+bash#!/bin/bash
+# Usage: bash 7_remove_old_files.sh <folder> <n_days>
+folder=$1; ndays=$2
+find "$folder" -maxdepth 1 -type f -mtime +$ndays -print0 | while IFS= read -r -d '' file; do
+    echo "Removing: $file"; rm "$file"
+done
+Run: bash 7_remove_old_files.sh /tmp/myfolder 15 → Deletes files older than 15 days
+
+8. Even/Odd to Separate Files — 8_even_odd.sh
+bash#!/bin/bash
+read -p "Input filename: " fname
+> even; > odd
+while read num; do
+    (( num % 2 == 0 )) && echo $num >> even || echo $num >> odd
+done < "$fname"
+echo "Evens:"; cat even
+echo "Odds:";  cat odd
+Input file: 1 2 3 4 5 6 7 8 9 10 → even: 2,4,6,8,10 | odd: 1,3,5,7,9
+
+9. Smallest Filename by Length — 9_smallest_filename.sh
+bash#!/bin/bash
+min_len=99999; min_name=""
+for file in *; do
+    [ -f "$file" ] || continue
+    len=${#file}
+    [ $len -lt $min_len ] && min_len=$len && min_name=$file
+done
+echo "Smallest filename: '$min_name' (length: $min_len)"
+Output: Smallest filename: 'odd' (length: 3 characters)
+
+10. Bubble Sort — 10_bubble_sort.sh
+bash#!/bin/bash
+read -p "Number of elements: " n
+arr=()
+for (( i=0; i<n; i++ )); do read -p "Element $((i+1)): " e; arr+=($e); done
+echo "Before: ${arr[@]}"
+
+for (( i=0; i<n-1; i++ )); do
+    for (( j=0; j<n-i-1; j++ )); do
+        if [ ${arr[$j]} -gt ${arr[$((j+1))]} ]; then
+            temp=${arr[$j]}; arr[$j]=${arr[$((j+1))]}; arr[$((j+1))]=$temp
+        fi
+    done
+done
+echo "After:  ${arr[@]}"
+Input: 64 25 12 22 11 90 → Output: 11 12 22 25 64 90
+
+11. Prime Check + Reverse — 11_prime_reverse.sh
+bash#!/bin/bash
+read -p "Enter a number: " num
+
+# Prime Check
+is_prime=1
+[ $num -lt 2 ] && is_prime=0
+for (( i=2; i*i<=num; i++ )); do (( num%i==0 )) && is_prime=0 && break; done
+[ $is_prime -eq 1 ] && echo "$num IS prime" || echo "$num is NOT prime"
+
+# Reverse
+rev=0; temp=$num
+while [ $temp -gt 0 ]; do
+    rev=$(( rev*10 + temp%10 )); temp=$(( temp/10 ))
+done
+echo "Reverse of $num = $rev"
+17: IS prime, Reverse = 71 | 12: NOT prime, Reverse = 21
+
+12. Substring Count via Args — 12_substring_count.sh
+bash#!/bin/bash
+# Usage: bash 12_substring_count.sh "main string" "sub"
+main_str="$1"; sub_str="$2"
+count=0; temp="$main_str"
+while [[ "$temp" == *"$sub_str"* ]]; do
+    temp="${temp#*$sub_str}"; (( count++ ))
+done
+echo "Substring '$sub_str' found $count time(s)"
+Run: bash 12_substring_count.sh "the cat on the mat near the hat" "the" → Found 3 times
+
+13. Decimal ↔ Binary Converter — 13_decimal_binary.sh
+bash#!/bin/bash
+echo "1. Decimal→Binary  2. Binary→Decimal"
+read -p "Choice: " choice
+case $choice in
+    1) read -p "Decimal: " dec; num=$dec; binary=""
+       while [ $num -gt 0 ]; do binary="$(( num%2 ))$binary"; num=$(( num/2 )); done
+       echo "Binary: $binary" ;;
+    2) read -p "Binary: " bin; decimal=0
+       for (( i=0; i<${#bin}; i++ )); do decimal=$(( decimal*2 + ${bin:$i:1} )); done
+       echo "Decimal: $decimal" ;;
+esac
+45 → 101101 | 101101 → 45 ✓
+
+14. Student Marks & Grade — 14_student_marks.sh
+bash#!/bin/bash
+read -p "Name: " name
+read -p "Subject 1: " m1; read -p "Subject 2: " m2; read -p "Subject 3: " m3
+total=$(( m1+m2+m3 )); pct=$(( total/3 ))
+echo "Total: $total/300  Percentage: $pct%"
+if   [ $pct -ge 60 ]; then echo "FIRST CLASS"
+elif [ $pct -ge 50 ]; then echo "SECOND CLASS"
+elif [ $pct -ge 35 ]; then echo "PASS CLASS"
+else echo "FAIL"; fi
+Alice (75,68,82): 75% → FIRST CLASS | Bob (30,28,32): 30% → FAIL
+
+15. Sum of N Even Numbers (with Function) — 15_sum_even.sh
+bash#!/bin/bash
+# Usage: bash 15_sum_even.sh <limit>
+sum_even_numbers() {
+    local n=$1; local sum=0; local num=2
+    for (( count=0; count<n; count++ )); do
+        echo -n "$num "
+        sum=$(( sum + num )); num=$(( num+2 ))
+    done
+    echo; echo "Sum of first $n even numbers = $sum"
+}
+sum_even_numbers $1
+Run: bash 15_sum_even.sh 5 → 2 4 6 8 10 → Sum = 30
+
+
+
+To run a C/C++ program in WSL (Windows Subsystem for Linux), follow these basic steps.
+
+---
+
+# 1. Open WSL Terminal
+
+Open:
+
+```text id="f1g2h3"
+Ubuntu / WSL Terminal
+```
+
+---
+
+# 2. Go to Folder
+
+Example:
+
+```bash id="k4l5m6"
+cd /mnt/c/Users/Admin/Desktop
+```
+
+`/mnt/c` represents the Windows C: drive.
+
+---
+
+# 3. Create File
+
+For C++:
+
+```bash id="n7o8p9"
+nano program.cpp
+```
+
+Paste code.
+
+Save using:
+
+```text id="q0r1s2"
+CTRL + O
+ENTER
+CTRL + X
+```
+
+---
+
+# 4. Compile Program
+
+For C++:
+
+```bash id="t3u4v5"
+g++ program.cpp -o program
+```
+
+For C:
+
+```bash id="w6x7y8"
+gcc program.c -o program
+```
+
+---
+
+# 5. Run Program
+
+```bash id="z9a0b1"
+./program
+```
+
+---
+
+# Full Example
+
+Suppose file:
+
+```text id="c2d3e4"
+test.cpp
+```
+
+---
+
+## Compile
+
+```bash id="f5g6h7"
+g++ test.cpp -o test
+```
+
+---
+
+## Run
+
+```bash id="i8j9k0"
+./test
+```
+
+---
+
+# If g++ Not Installed
+
+Install compiler:
+
+```bash id="l1m2n3"
+sudo apt update
+sudo apt install g++
+```
+
+For C compiler:
+
+```bash id="o4p5q6"
+sudo apt install gcc
+```
+
+---
+
+# Example Output
+
+```text id="r7s8t9"
+Enter number:
+5
+Output = 5
+```
+
+---
+
+# Quick One-Line Compile + Run
+
+```bash id="u0v1w2"
+g++ program.cpp -o program && ./program
+```
+
+This:
+
+1. Compiles
+2. Runs immediately if compilation successful.
